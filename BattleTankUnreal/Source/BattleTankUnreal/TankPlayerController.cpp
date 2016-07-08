@@ -3,10 +3,22 @@
 #include "BattleTankUnreal.h"
 #include "TankPlayerController.h"
 
+// Get a pointer to the tank the player contorller is possesing
+ATank* ATankPlayerController::GetControlledTank() const { return Cast<ATank>(GetPawn()); }
 
-ATank* ATankPlayerController::GetControlledTank() const
+
+void ATankPlayerController::BeginPlay()
 {
-	return Cast<ATank>(GetPawn());
+	Super::BeginPlay();
+
+	ATank* ControlledTank = GetControlledTank();
+
+	if (ControlledTank)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Tank Player controller is posessing: %s"), *(ControlledTank->GetName()));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Tank Player Controller is not controlling a tank!"));
+	}
 }
-
-
