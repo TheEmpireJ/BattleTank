@@ -27,3 +27,18 @@ void ATankAIController::BeginPlay()
 		UE_LOG(LogTemp, Error, TEXT("Tank AI Controller is not controlling a tank!"));
 	}
 }
+
+void ATankAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (GetPlayerTank())
+	{
+		// TODO Move towards player
+
+		/// Aim at the player
+		GetControlledTank()->AimAt(GetPlayerTank()->GetActorLocation());
+
+		// TODO fire if ready
+	}
+}

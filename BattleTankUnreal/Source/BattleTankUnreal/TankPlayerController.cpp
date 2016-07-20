@@ -13,7 +13,6 @@ void ATankPlayerController::Tick(float DeltaTime)
 
 	AimTowardsCrosshair();
 
-	// UE_LOG(LogTemp, Warning, TEXT("Tick, Tock!"));
 }
 
 // Called when the game starts or when spawned
@@ -33,24 +32,67 @@ void ATankPlayerController::BeginPlay()
 	}
 }
 
-bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
-{
-	// get player camera vector
-	// line trace along vector
-	HitLocation = FVector(1.0);
-	return false;
-}
-
 void ATankPlayerController::AimTowardsCrosshair()
 {
-	if (!GetControlledTank()) { return; }	
+	if (!GetControlledTank()) { return; }
 
 	FVector HitLocation; // Out Parameter
 	if (GetSightRayHitLocation(HitLocation)) // Has "side-effect", is going to line trace
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HitLocation: %s"), *HitLocation.ToString())
-			// Get world location of linetrace though crosshair
-			// If it hits the landscape
-				// Tell controlled tank to aim at this point
+		GetControlledTank()->AimAt(HitLocation);
 	}
 }
+
+bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
+{
+	/// Find the crosshair position
+	int32 ViewportSizeX, ViewportSizeY;
+	GetViewportSize(ViewportSizeX, ViewportSizeY);
+	FVector2D ScreenLocation = FVector2D(ViewportSizeX * CrosshairXLocation, ViewportSizeY * CrosshairYLocation);
+
+	/// de-project the screen position of the crosshair to a world position
+	FVector LookDirection; // out parameter
+	if (GetLookDirection(ScreenLocation, LookDirection))
+	{
+		// Line trace along that LookDirection, and see what we hit (up to Max Range)
+		return GetLookVectorHitLocation(LookDirection, HitLocation);
+	}
+	return false;
+}
+
+bool ATankPlayerController::GetLookVectorHitLocation(FVector LookDirection, FVector& HitLocation) const
+{
+	FHitResult HitResult;
+	FVector CameraPosition, LineTraceEnd;
+	FRotator CameraRotation;
+
+	// calculate start and end points
+	GetPlayerViewPoint(CameraPosition, CameraRotation);
+	LineTraceEnd = CameraPosition + ( LookDirection * LineTraceRange );
+
+	// do the line trace out 
+	if (GetWorld()->LineTraceSingleByChannel(HitResult,
+		CameraPosition,
+		LineTraceEnd,
+		ECollisionChannel::ECC_Visibility)
+		)
+	{
+		HitLocation = HitResult.Location;
+		return true;
+	}
+
+	HitLocation = FVector(0);
+	return false;
+}
+
+bool ATankPlayerController::GetLookDirection(FVector2D ScreenLocation, FVector& LookDirection) const
+{
+	FVector WorldLocation; // to be discarded
+	return DeprojectScreenPositionToWorld(ScreenLocation.X,       // unreal provided function
+		ScreenLocation.Y, 
+		WorldLocation, 
+		LookDirection
+	);
+}
+
+
