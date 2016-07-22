@@ -2,6 +2,7 @@
 
 #include "BattleTankUnreal.h"
 #include "TankAIController.h"
+#include "Tank.h"
 
 ATank* ATankAIController::GetControlledTank() const { return Cast<ATank>(GetPawn()); }
 

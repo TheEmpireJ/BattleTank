@@ -2,6 +2,7 @@
 
 #include "BattleTankUnreal.h"
 #include "TankPlayerController.h"
+#include "Tank.h"
 
 // Get a pointer to the tank the player contorller is possesing
 ATank* ATankPlayerController::GetControlledTank() const { return Cast<ATank>(GetPawn()); }
