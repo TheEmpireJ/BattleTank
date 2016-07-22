@@ -3,7 +3,7 @@
 #include "BattleTankUnreal.h"
 #include "TankBarrel.h"
 
-
+// RelativeSpeed is clampped between -1 and 1.
 void UTankBarrel::Elevate(float RelativeSpeed)
 {
 	// Move the barrel the right amount this frame
