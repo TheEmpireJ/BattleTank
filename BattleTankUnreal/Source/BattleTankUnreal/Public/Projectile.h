@@ -20,6 +20,11 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
+	// Tell the projectile to launch in the direction it is facing going at speed cm/s
+	void LaunchProjectile(float speed);
+
+protected:
+	UProjectileMovementComponent* ProjectileMovementComponent = nullptr;
 	
 	
 };
